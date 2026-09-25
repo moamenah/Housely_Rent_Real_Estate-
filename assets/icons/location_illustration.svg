@@ -1,0 +1,73 @@
+<svg width="360" height="300" viewBox="0 0 360 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Soft lavender backdrop -->
+  <ellipse cx="175" cy="150" rx="152" ry="112" fill="#EDE9FE" fill-opacity="0.65"/>
+  <!-- Ground shadow -->
+  <ellipse cx="180" cy="252" rx="164" ry="36" fill="#E5E7F0"/>
+
+  <!-- Folded map: three panels alternating tone -->
+  <path d="M50 140 L135 110 L135 255 L50 230 Z" fill="#F3F4F6"/>
+  <path d="M135 110 L225 140 L225 270 L135 255 Z" fill="#E4E7EC"/>
+  <path d="M225 140 L310 112 L310 248 L225 270 Z" fill="#F3F4F6"/>
+
+  <!-- Streets, drawn across the folds -->
+  <path d="M56 186 L135 160 L225 192 L306 162" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+  <path d="M96 126 L104 240" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <path d="M172 126 L170 262" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <path d="M262 132 L258 258" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <path d="M54 224 L135 236 L225 236 L306 214" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Map pins -->
+  <g transform="translate(92,128)">
+    <path d="M12 0 C5.4 0 0 5.4 0 12 C0 21 12 32 12 32 S24 21 24 12 C24 5.4 18.6 0 12 0 Z" fill="#9E77ED"/>
+    <circle cx="12" cy="12" r="4.5" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(268,150)">
+    <path d="M12 0 C5.4 0 0 5.4 0 12 C0 21 12 32 12 32 S24 21 24 12 C24 5.4 18.6 0 12 0 Z" fill="#7F56D9"/>
+    <circle cx="12" cy="12" r="4.5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Floating info cards, left -->
+  <rect x="28" y="104" width="62" height="54" rx="10" fill="#FFFFFF"/>
+  <circle cx="59" cy="131" r="13" fill="#7F56D9"/>
+  <path d="M53 131 L57 136 L66 125" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="34" y="172" width="66" height="48" rx="10" fill="#FFFFFF"/>
+  <circle cx="51" cy="189" r="7" fill="#FDB022"/>
+  <rect x="63" y="185" width="27" height="5" rx="2.5" fill="#D0D5DD"/>
+  <rect x="63" y="195" width="20" height="5" rx="2.5" fill="#E4E7EC"/>
+
+  <!-- Magnifier with the house inside the lens -->
+  <path d="M225 205 L253 233" stroke="#53389E" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="186" cy="166" r="54" fill="#FFFFFF"/>
+  <circle cx="186" cy="166" r="54" stroke="#7F56D9" stroke-width="10"/>
+  <rect x="168" y="158" width="36" height="30" rx="3" fill="#7F56D9"/>
+  <path d="M164 161 L186 139 L208 161 Z" fill="#7F56D9"/>
+  <rect x="179" y="170" width="14" height="18" rx="2" fill="#F4EBFF"/>
+
+  <!-- Potted plant, right -->
+  <path d="M312 234 C300 222 301 206 313 198 C318 212 318 226 312 234 Z" fill="#9E77ED"/>
+  <path d="M324 234 C336 224 338 208 328 198 C321 210 319 226 324 234 Z" fill="#6941C6"/>
+  <path d="M318 236 L320 200" stroke="#53389E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M296 238 L344 238 L337 274 L303 274 Z" fill="#F3A35C"/>
+  <rect x="292" y="230" width="56" height="11" rx="5" fill="#F5B272"/>
+
+  <!-- Clouds -->
+  <g fill="#DDD6FE">
+    <circle cx="42" cy="52" r="12"/>
+    <circle cx="58" cy="46" r="16"/>
+    <circle cx="75" cy="54" r="11"/>
+    <rect x="40" y="56" width="37" height="11" rx="5.5"/>
+  </g>
+  <g fill="#E9D7FE">
+    <circle cx="160" cy="34" r="10"/>
+    <circle cx="174" cy="28" r="14"/>
+    <circle cx="189" cy="36" r="10"/>
+    <rect x="159" y="39" width="33" height="10" rx="5"/>
+  </g>
+  <g fill="#DDD6FE">
+    <circle cx="304" cy="66" r="11"/>
+    <circle cx="319" cy="60" r="15"/>
+    <circle cx="335" cy="68" r="10"/>
+    <rect x="303" y="71" width="35" height="10" rx="5"/>
+  </g>
+</svg>

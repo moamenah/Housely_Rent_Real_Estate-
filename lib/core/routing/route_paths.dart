@@ -1,0 +1,87 @@
+/// Central registry of navigation paths & route names.
+///
+/// Views navigate with `context.go(RoutePaths.property(id))` /
+/// `context.push(...)` — a path string is never written inline in a widget.
+abstract final class RoutePaths {
+  RoutePaths._();
+
+  /// Cold-start brand screen.
+  static const String splash = '/splash';
+
+  /// Intro carousel, shown right after the splash.
+  static const String onboarding = '/onboarding';
+
+  /// Sign-in screen, shown after onboarding.
+  static const String login = '/login';
+
+  /// Registration screen, reachable from the sign-in screen.
+  static const String signup = '/signup';
+
+  // ── Location step (between auth and the shell) ──────────────────────────
+  /// "Hi, Nice to meet you !" — permission/greeting screen, after auth.
+  static const String locationPermission = '/location-permission';
+
+  /// Map screen: drop a pin, search, confirm the address.
+  static const String locationPicker = '/location-picker';
+
+  // ── Bottom-nav branches (design order: Home · Explore · Favorite ·
+  //    My Booking · Profile) ────────────────────────────────────────────────
+  /// Bottom-nav branch: Home (placeholder until its design lands).
+  static const String home = '/home';
+
+  /// Bottom-nav branch: property feed.
+  static const String explore = '/explore';
+
+  /// Bottom-nav branch: saved listings.
+  static const String favorites = '/favorites';
+
+  /// Bottom-nav branch: bookings (placeholder until its design lands).
+  static const String bookings = '/bookings';
+
+  /// Bottom-nav branch: account hub.
+  static const String profile = '/profile';
+
+  /// Profile editing form, full-screen above the shell (has a back arrow).
+  static const String profileEdit = '/profile/edit';
+
+  /// Full-screen detail page, above the shell navigator.
+  static const String propertyDetails = '/property/:id';
+
+  static String property(String id) => '/property/$id';
+
+  // ── Password recovery (one flow, four screens) ───────────────────────────
+  /// Step 1: pick which masked contact receives the reset code.
+  static const String forgotPassword = '/forgot-password';
+
+  /// Step 2: enter the emailed code.
+  static const String verifyCode = '/verify-code';
+
+  /// Step 3: choose the new password.
+  static const String resetPassword = '/reset-password';
+
+  /// Step 4: confirmation, then back to sign-in.
+  static const String passwordChanged = '/password-changed';
+}
+
+/// Human-readable route names, useful for `GoRouterState.name` checks and logs.
+abstract final class RouteNames {
+  RouteNames._();
+
+  static const String splash = 'splash';
+  static const String onboarding = 'onboarding';
+  static const String login = 'login';
+  static const String signup = 'signup';
+  static const String locationPermission = 'location-permission';
+  static const String locationPicker = 'location-picker';
+  static const String forgotPassword = 'forgot-password';
+  static const String verifyCode = 'verify-code';
+  static const String resetPassword = 'reset-password';
+  static const String passwordChanged = 'password-changed';
+  static const String home = 'home';
+  static const String explore = 'explore';
+  static const String favorites = 'favorites';
+  static const String bookings = 'bookings';
+  static const String profile = 'profile';
+  static const String profileEdit = 'profile-edit';
+  static const String propertyDetails = 'property-details';
+}
