@@ -5,9 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/views/login_view.dart';
 import '../../features/auth/views/sign_up_view.dart';
-import '../../features/bookings/views/my_bookings_view.dart';
+import '../../features/booking/views/add_card_view.dart';
+import '../../features/booking/views/booking_view.dart';
 import '../../features/favorites/views/favorites_view.dart';
+import '../../features/home/repositories/home_repository.dart';
 import '../../features/home/views/home_view.dart';
+import '../../features/home/views/popular_view.dart';
 import '../../features/location/repositories/location_repository.dart';
 import '../../features/location/views/location_permission_view.dart';
 import '../../features/location/views/location_picker_view.dart';
@@ -21,6 +24,7 @@ import '../../features/password_recovery/views/verify_code_view.dart';
 import '../../features/profile/repositories/profile_repository.dart';
 import '../../features/profile/views/edit_profile_view.dart';
 import '../../features/profile/views/profile_view.dart';
+import '../../features/properties/repositories/property_repository.dart';
 import '../../features/properties/views/properties_view.dart';
 import '../../features/properties/views/property_details_view.dart';
 import '../../features/splash/views/splash_view.dart';
@@ -51,13 +55,15 @@ final GlobalKey<NavigatorState> rootNavigatorKey =
 /// ├── /reset-password    ← new password
 /// └── /password-changed  ← success, back to /login
 /// StatefulShellRoute.indexedStack   ← keeps each branch's state alive
-/// ├── /home        (HomeView, placeholder)
+/// ├── /home        (HomeView — location header, search, promo, 4 rails)
 /// ├── /explore     (PropertiesView)
 /// ├── /favorites   (FavoritesView)
-/// ├── /bookings    (MyBookingsView, placeholder)
+/// ├── /bookings    (BookingView — the session's current checkout)
 /// └── /profile     (ProfileView)
 /// /profile/edit                    ← full screen, above the shell
 /// /property/:id                    ← full screen, above the shell
+/// /booking                         ← full screen, pushed by "Rent now"
+/// /booking/add-card                ← full screen, pushed by the checkout
 /// ```
 /// The auth screens land on `/location-permission`, so every session passes
 /// the greeting/location step before the shell (`Skip`, *Use current
@@ -151,7 +157,14 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: RoutePaths.home,
               name: RouteNames.home,
-              builder: (context, state) => const HomeView(),
+              builder: (context, state) =>
+                  HomeView(homeRepository: sl<HomeRepository>()),
+            ),
+            GoRoute(
+              path: RoutePaths.popular,
+              name: RouteNames.popular,
+              builder: (context, state) =>
+                  PopularView(homeRepository: sl<HomeRepository>()),
             ),
           ],
         ),
@@ -178,7 +191,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: RoutePaths.bookings,
               name: RouteNames.bookings,
-              builder: (context, state) => const MyBookingsView(),
+              builder: (context, state) => const BookingView(),
             ),
           ],
         ),
@@ -207,7 +220,20 @@ final GoRouter appRouter = GoRouter(
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) => PropertyDetailsView(
         propertyId: state.pathParameters['id'] ?? '',
+        propertyRepository: sl<PropertyRepository>(),
       ),
+    ),
+    GoRoute(
+      path: RoutePaths.booking,
+      name: RouteNames.booking,
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const BookingView(),
+    ),
+    GoRoute(
+      path: RoutePaths.addCard,
+      name: RouteNames.addCard,
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const AddCardView(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

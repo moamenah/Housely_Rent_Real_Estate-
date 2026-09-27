@@ -19,14 +19,16 @@ class Property extends Equatable {
     required this.reviewsCount,
     this.type = PropertyType.apartment,
     this.isFeatured = false,
+    this.pricePeriod = PricePeriod.month,
   });
 
   final String id;
   final String title;
   final String description;
 
-  /// Monthly price in USD.
+  /// Price in USD — billed per [pricePeriod] (monthly for most listings).
   final double price;
+  final PricePeriod pricePeriod;
   final String location;
   final int bedrooms;
   final int bathrooms;
@@ -42,6 +44,7 @@ class Property extends Equatable {
     String? title,
     String? description,
     double? price,
+    PricePeriod? pricePeriod,
     String? location,
     int? bedrooms,
     int? bathrooms,
@@ -57,6 +60,7 @@ class Property extends Equatable {
       title: title ?? this.title,
       description: description ?? this.description,
       price: price ?? this.price,
+      pricePeriod: pricePeriod ?? this.pricePeriod,
       location: location ?? this.location,
       bedrooms: bedrooms ?? this.bedrooms,
       bathrooms: bathrooms ?? this.bathrooms,
@@ -75,6 +79,7 @@ class Property extends Equatable {
         title,
         description,
         price,
+        pricePeriod,
         location,
         bedrooms,
         bathrooms,
@@ -92,7 +97,8 @@ enum PropertyType {
   house('House'),
   villa('Villa'),
   studio('Studio'),
-  townhouse('Townhouse');
+  townhouse('Townhouse'),
+  hotel('Hotel');
 
   const PropertyType(this.label);
 
@@ -103,4 +109,24 @@ enum PropertyType {
         (type) => type.name == name,
         orElse: () => PropertyType.apartment,
       );
+}
+
+/// How [Property.price] is billed: most listings are monthly, short stays
+/// nightly — the design's Home screen shows both (`$320/month`,
+/// `$120/night`).
+enum PricePeriod {
+  month,
+  night;
+
+  static PricePeriod fromName(String? name) =>
+      PricePeriod.values.firstWhere(
+        (period) => period.name == name,
+        orElse: () => PricePeriod.month,
+      );
+
+  /// Suffix appended to the price in the Home feed: `month` → `/month`.
+  String get suffix => this == month ? '/month' : '/night';
+
+  /// Compact suffix used by the Explore cards: `month` → `/mo`.
+  String get shortSuffix => this == month ? '/mo' : '/night';
 }

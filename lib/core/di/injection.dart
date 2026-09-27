@@ -5,6 +5,14 @@ import '../../features/auth/datasources/auth_data_source.dart';
 import '../../features/auth/datasources/mock_auth_data_source.dart';
 import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/auth_repository_impl.dart';
+import '../../features/booking/datasources/booking_data_source.dart';
+import '../../features/booking/datasources/mock_booking_data_source.dart';
+import '../../features/booking/repositories/booking_repository.dart';
+import '../../features/booking/repositories/booking_repository_impl.dart';
+import '../../features/home/datasources/home_data_source.dart';
+import '../../features/home/datasources/mock_home_data_source.dart';
+import '../../features/home/repositories/home_repository.dart';
+import '../../features/home/repositories/home_repository_impl.dart';
 import '../../features/location/datasources/location_data_source.dart';
 import '../../features/location/datasources/mock_location_data_source.dart';
 import '../../features/location/repositories/location_repository.dart';
@@ -78,6 +86,18 @@ void _registerFeatures() {
     () => PropertyRepositoryImpl(dataSource: sl<PropertyDataSource>()),
   );
 
+  // ── Home ────────────────────────────────────────────────────────────────
+  // Section membership for the feed; the repository joins it against
+  // PropertyRepository so Home, Explore and Favorites share one corpus.
+  sl.registerLazySingleton<HomeDataSource>(MockHomeDataSource.new);
+
+  sl.registerLazySingleton<HomeRepository>(
+    () => HomeRepositoryImpl(
+      dataSource: sl<HomeDataSource>(),
+      propertyRepository: sl<PropertyRepository>(),
+    ),
+  );
+
   // ── Location ────────────────────────────────────────────────────────────
   // Address resolution for the map step; swap the mock for a geocoding
   // provider and the picker's ViewModel stays untouched.
@@ -93,5 +113,14 @@ void _registerFeatures() {
 
   sl.registerLazySingleton<ProfileRepository>(
     () => ProfileRepositoryImpl(dataSource: sl<ProfileDataSource>()),
+  );
+
+  // ── Booking ─────────────────────────────────────────────────────────────
+  // Checkout session (My Booking tab / "Rent now"): confirm runs through
+  // the mock gateway with real latency.
+  sl.registerLazySingleton<BookingDataSource>(MockBookingDataSource.new);
+
+  sl.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(dataSource: sl<BookingDataSource>()),
   );
 }

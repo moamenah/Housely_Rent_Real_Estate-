@@ -42,6 +42,10 @@ class RecoveryHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppDimensions.space24),
+
+
+
+
         Text(
           title,
           style: context.textTheme.headlineMedium?.copyWith(
@@ -51,7 +55,19 @@ class RecoveryHeader extends StatelessWidget {
             color: AppColors.gray900,
           ),
         ),
+
+
+
+
         const SizedBox(height: AppDimensions.space8),
+
+
+
+
+
+
+
+
         Text(
           subtitle,
           style: context.textTheme.bodyLarge?.copyWith(

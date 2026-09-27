@@ -6,24 +6,32 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/routing/route_paths.dart';
 import '../../../core/utils/extensions/context_extensions.dart';
+import '../../home/views/widgets/popular_tile.dart';
 import '../../properties/viewmodels/properties_cubit.dart';
 import '../../properties/viewmodels/properties_state.dart';
-import '../../properties/views/widgets/property_card.dart';
 import '../viewmodels/favorites_cubit.dart';
 import '../viewmodels/favorites_state.dart';
 
-/// Saved listings — the second branch of the shell.
+/// Saved listings — the Favorite branch of the shell.
 ///
 /// Reads two ViewModels on purpose: [FavoritesCubit] owns *which* ids are
 /// liked, `PropertiesCubit` owns the listing data. The View joins them; neither
-/// ViewModel needs to know about the other.
+/// ViewModel needs to know about the other. Rows are the compact tiles from
+/// the Popular list, split by the mockup's hairline dividers.
 class FavoritesView extends StatelessWidget {
   const FavoritesView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorites')),
+      appBar: AppBar(
+        title: const Text('Favorite'),
+        // The mockup draws a back arrow even on the tab: it returns to Home.
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.goBackTo(RoutePaths.home),
+        ),
+      ),
       body: BlocBuilder<FavoritesCubit, FavoritesState>(
         builder: (context, favorites) {
           if (favorites.isEmpty) {
@@ -37,7 +45,8 @@ class FavoritesView extends StatelessWidget {
                   .toList(growable: false);
 
               if (propertiesState.isLoading && favoritesList.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
+                // Static placeholder — never an indeterminate spinner.
+                return const _FavoritesSkeleton();
               }
 
               if (favoritesList.isEmpty) {
@@ -47,19 +56,65 @@ class FavoritesView extends StatelessWidget {
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(
                   AppDimensions.pagePadding,
-                  AppDimensions.space16,
+                  AppDimensions.space8,
                   AppDimensions.pagePadding,
                   AppDimensions.space32,
                 ),
                 itemCount: favoritesList.length,
                 separatorBuilder: (_, __) =>
-                    const SizedBox(height: AppDimensions.space16),
+                    const Divider(height: AppDimensions.space16),
                 itemBuilder: (_, index) =>
-                    PropertyCard(property: favoritesList[index]),
+                    PopularTile(property: favoritesList[index]),
               );
             },
           );
         },
+      ),
+    );
+  }
+}
+
+/// Static grey row placeholders shown while the listing data is still loading.
+class _FavoritesSkeleton extends StatelessWidget {
+  const _FavoritesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget bar(double width, double height) => Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: AppColors.gray100,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+          ),
+        );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.pagePadding),
+      child: Column(
+        children: [
+          for (var i = 0; i < 4; i++) ...[
+            Row(
+              children: [
+                bar(80, 64),
+                const SizedBox(width: AppDimensions.space12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      bar(160, 16),
+                      const SizedBox(height: AppDimensions.space8),
+                      bar(200, 12),
+                      const SizedBox(height: AppDimensions.space8),
+                      bar(100, 14),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.space16),
+          ],
+        ],
       ),
     );
   }

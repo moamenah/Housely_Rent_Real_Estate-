@@ -51,6 +51,15 @@ class PropertiesState extends Equatable {
       .where((property) => property.isFeatured)
       .toList(growable: false);
 
+  /// The single listing with [id] — joins like the booking checkout use
+  /// this instead of filtering in the view.
+  Property? propertyById(String id) {
+    for (final property in properties) {
+      if (property.id == id) return property;
+    }
+    return null;
+  }
+
   bool get isEmpty => hasData && visibleProperties.isEmpty;
 
   PropertiesState copyWith({

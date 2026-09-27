@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/routing/route_paths.dart';
 import '../../../../core/utils/extensions/context_extensions.dart';
 import '../../../../core/utils/extensions/number_extensions.dart';
+import '../../../../core/widgets/property_image.dart';
 import '../../../favorites/viewmodels/favorites_cubit.dart';
 import '../../../favorites/viewmodels/favorites_state.dart';
 import '../../models/property.dart';
@@ -31,24 +31,10 @@ class PropertyCard extends StatelessWidget {
               children: [
                 AspectRatio(
                   aspectRatio: 16 / 10,
-                  child: Hero(
-                    tag: 'property-image-${property.id}',
-                    child: CachedNetworkImage(
-                      imageUrl: property.imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      placeholder: (_, __) =>
-                          const ColoredBox(color: AppColors.gray100),
-                      errorWidget: (_, __, ___) => const ColoredBox(
-                        color: AppColors.gray100,
-                        child: Icon(
-                          Icons.home_work_outlined,
-                          size: 40,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Plain image — a Hero tag here would collide with the same
+                  // listing rendered in another shell branch (duplicate tags
+                  // in one subtree make Flutter's navigator assert).
+                  child: PropertyImage(imageUrl: property.imageUrl),
                 ),
                 Positioned(
                   top: AppDimensions.space12,
@@ -94,32 +80,54 @@ class PropertyCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppDimensions.space12),
                   Row(
+                    // `spaceBetween` + a shrinkable rating group keeps this
+                    // row safe on narrow cards: the reviews count yields to an
+                    // ellipsis instead of overflowing the card.
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        size: AppDimensions.iconSm,
-                        color: AppColors.warning500,
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: AppDimensions.iconSm,
+                              color: AppColors.warning500,
+                            ),
+                            const SizedBox(width: AppDimensions.space4),
+                            Text(
+                              property.rating.toRating(),
+                              style: context.textTheme.labelMedium,
+                            ),
+                            Flexible(
+                              child: Text(
+                                ' (${property.reviewsCount})',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: context.textTheme.bodySmall,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: AppDimensions.space4),
-                      Text(
-                        property.rating.toRating(),
-                        style: context.textTheme.labelMedium,
-                      ),
-                      Text(
-                        ' (${property.reviewsCount})',
-                        style: context.textTheme.bodySmall,
-                      ),
-                      const Spacer(),
-                      _MiniSpec(icon: Icons.bed_outlined, value: '${property.bedrooms}'),
-                      const SizedBox(width: AppDimensions.space12),
-                      _MiniSpec(
-                        icon: Icons.bathtub_outlined,
-                        value: '${property.bathrooms}',
-                      ),
-                      const SizedBox(width: AppDimensions.space12),
-                      Text(
-                        property.areaSqm.toArea(),
-                        style: context.textTheme.bodySmall,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _MiniSpec(
+                            icon: Icons.bed_outlined,
+                            value: '${property.bedrooms}',
+                          ),
+                          const SizedBox(width: AppDimensions.space12),
+                          _MiniSpec(
+                            icon: Icons.bathtub_outlined,
+                            value: '${property.bathrooms}',
+                          ),
+                          const SizedBox(width: AppDimensions.space12),
+                          Text(
+                            property.areaSqm.toArea(),
+                            style: context.textTheme.bodySmall,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -128,7 +136,8 @@ class PropertyCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${property.price.toPrice()}/mo',
+                        '${property.price.toPrice()}'
+                        '${property.pricePeriod.shortSuffix}',
                         style: context.textTheme.titleMedium
                             ?.copyWith(color: AppColors.primary),
                       ),

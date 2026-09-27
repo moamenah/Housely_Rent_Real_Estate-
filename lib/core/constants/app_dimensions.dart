@@ -31,6 +31,10 @@ abstract final class AppDimensions {
   static const double radiusMd = 8;
   static const double radiusLg = 12;
   static const double radiusXl = 16;
+
+  /// Hero media corners — promo banner + featured Home card. Measured from the
+  /// kit's `Banner_1`/`Banner_2` exports (35px on a 448px-wide card ≈ 18dp).
+  static const double radiusMedia = 18;
   static const double radius2xl = 20;
   static const double radiusFull = 999;
 
@@ -43,6 +47,9 @@ abstract final class AppDimensions {
   static const double iconLg = 24;
   static const double iconXl = 32;
   static const double buttonHeight = 48;
+
+  /// Taller primary CTA (the details screen's "Rent now").
+  static const double buttonHeightLarge = 56;
   static const double inputHeight = 48;
   static const double appBarHeight = 56;
   static const double bottomNavBarHeight = 72;

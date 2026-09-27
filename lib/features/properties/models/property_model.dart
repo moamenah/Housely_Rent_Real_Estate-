@@ -20,6 +20,7 @@ class PropertyModel {
     required this.reviewsCount,
     required this.type,
     this.isFeatured = false,
+    this.pricePeriod = 'month',
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +38,7 @@ class PropertyModel {
       reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
       type: json['type'] as String? ?? PropertyType.apartment.name,
       isFeatured: json['is_featured'] as bool? ?? false,
+      pricePeriod: json['price_period'] as String? ?? 'month',
     );
   }
 
@@ -54,6 +56,9 @@ class PropertyModel {
   final String type;
   final bool isFeatured;
 
+  /// [PricePeriod] name — enums don't survive JSON on their own.
+  final String pricePeriod;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
@@ -68,6 +73,7 @@ class PropertyModel {
         'reviews_count': reviewsCount,
         'type': type,
         'is_featured': isFeatured,
+        'price_period': pricePeriod,
       };
 
   /// Maps the DTO onto the domain entity used by the ViewModels/Views.
@@ -85,5 +91,6 @@ class PropertyModel {
         reviewsCount: reviewsCount,
         type: PropertyType.fromName(type),
         isFeatured: isFeatured,
+        pricePeriod: PricePeriod.fromName(pricePeriod),
       );
 }

@@ -8,7 +8,10 @@ import 'favorites_state.dart';
 /// navigation between branches. Persistence is intentionally left to a future
 /// local data source — swap the in-memory `Set` for a repository call here.
 class FavoritesCubit extends Cubit<FavoritesState> {
-  FavoritesCubit() : super(const FavoritesState());
+  /// [initialIds] seeds the session (the app opens with the mockup's heart
+  /// states already applied); tests default to an empty set.
+  FavoritesCubit({Set<String> initialIds = const {}})
+      : super(FavoritesState(propertyIds: initialIds));
 
   void toggle(String propertyId) {
     final next = Set<String>.of(state.propertyIds);

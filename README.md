@@ -32,7 +32,7 @@ lib/
 │   ├── di/                      # get_it service locator
 │   ├── theme/                   # AppTheme (light/dark ThemeData)
 │   ├── utils/                   # extensions (context, numbers), form_validators
-│   └── widgets/                 # ErrorView, AppLoadingIndicator, PlaceholderView
+│   └── widgets/                 # ErrorView, AppLoadingIndicator, PropertyImage
 └── features/
     ├── splash/                  # cold start (initial route)
     │   ├── viewmodels/          # SplashCubit/State — bootstrap + min display time
@@ -65,10 +65,18 @@ lib/
     │   ├── repositories/        # ProfileRepository (+ impl) — read + save
     │   ├── viewmodels/          # ProfileCubit/State, EditProfileCubit/State
     │   └── views/               # ProfileView, EditProfileView + widgets/profile_avatar
-    ├── home/                    # shell tab — honest PlaceholderView
-    │   └── views/               # HomeView
-    ├── bookings/                # shell tab — honest PlaceholderView
-    │   └── views/               # MyBookingsView
+    ├── home/                    # landing feed (the design's first tab)
+    │   ├── models/              # TopLocation, HomeFeedPlan, HomeFeed (entities)
+    │   ├── datasources/         # HomeDataSource + mock (section membership only)
+    │   ├── repositories/        # HomeRepository (+ impl) — joins PropertyRepository
+    │   ├── viewmodels/          # HomeCubit/State — feed, failure, selected chip
+    │   └── views/               # HomeView + widgets/ (cards, tiles, chips, hearts)
+    ├── booking/                  # checkout (My Booking tab + details' Rent now)
+    │   ├── models/               # PaymentCard (grouped number, mask, last4)
+    │   ├── datasources/          # BookingDataSource + mock (500ms confirm)
+    │   ├── repositories/         # BookingRepository (+ impl) — range normalisation
+    │   ├── viewmodels/           # BookingCubit/State (session), AddCardCubit/State
+    │   └── views/                # BookingView, AddCardView + widgets/ (card, sheets)
     ├── properties/              # Model + ViewModel + View
     │   ├── models/              # Property (entity), PropertyModel (DTO)
     │   ├── datasources/         # PropertyDataSource + mock + REST impl
@@ -110,11 +118,13 @@ implementation).
 
 `core/di/injection.dart` registers long-lived objects only (API client, data
 sources, repositories). Cubits are created per screen with `BlocProvider`;
-`PropertiesCubit`, `FavoritesCubit` and `ThemeCubit` are session-scoped in
-`app/app.dart`.
+`PropertiesCubit`, `FavoritesCubit`, `BookingCubit` and `ThemeCubit` are
+session-scoped in `app/app.dart`.
 
-The app currently runs on `MockPropertyDataSource` (offline fixture). To go
-live, register `PropertyRemoteDataSource` instead — no other file changes.
+The app currently runs on `MockPropertyDataSource` (an offline fixture that
+mirrors the design kit's Yogyakarta/Bali listings, so Home, Explore, Favorites
+and Details all render the same corpus). To go live, register
+`PropertyRemoteDataSource` instead — no other file changes.
 
 ### Routing
 
@@ -122,8 +132,11 @@ live, register `PropertyRemoteDataSource` instead — no other file changes.
 a five-branch `StatefulShellRoute` (`/home`, `/explore`, `/favorite`,
 `/bookings`, `/profile`) rendered by a custom `AppShell` bottom bar — a purple
 indicator sits over the active tab and each branch keeps its own state;
-`/property/:id` and `/profile/edit` are pushed on the root navigator above the
-bar, while `/location-permission` and `/location-picker` sit *outside* the
+`/property/:id`, `/profile/edit`, `/booking` and `/booking/add-card` are pushed
+on the root navigator above the
+bar, and `/home/popular` is pushed *inside* the Home branch so the tab bar
+stays visible and its back arrow returns to the feed, while
+`/location-permission` and `/location-picker` sit *outside* the
 shell because they are the post-auth gate. Paths live in `RoutePaths` — never
 inline a route string. The public flow is linear and explicit:
 `/splash → /onboarding → /login ⇄ /signup`, and a successful sign-in *or*
@@ -198,16 +211,69 @@ camera badges are honest stubs (`"$label isn't available in this build yet."`
 snackbars); *Sign Out* returns to `/login`, and the avatar (or *Edit profile*)
 opens `/profile/edit` on the root navigator.
 
+Home is a full MVVM slice rendered from the design's landing feed.
+`MockHomeDataSource` returns a `HomeFeedPlan` — ids only (recommended,
+nearby, popular, destination chips) — and `HomeRepositoryImpl.getFeed()` joins
+it against `PropertyRepository`, so one corpus backs every screen. The View is
+chrome + rails: a location header with bell/chat stubs, a search field and the
+promo banner (both hand off to Explore / a snackbar), then *Recommended*
+(featured-card rail), *Nearby* (two-row grid rail), *Top Locations* (selection
+chips driven by `HomeCubit.selectTopLocation`) and *Popular for you* (rows
+whose *See all* pushes `/home/popular` — the feed shows the first three rows
+like the mockup, the pushed screen the full membership through `PopularCubit`).
+Rails bleed off the right edge like the mockup while text keeps the page
+gutter; hearts share the session `FavoritesCubit` with the Favorites tab, and
+loading shows a static skeleton — never shimmer, which would hang
+`pumpAndSettle` in tests.
+
+Favorites is the design's *Favorite* list: `FavoritesCubit` owns the liked ids
+(session-scoped, seeded with the mockup's hearts) while `PropertiesCubit` owns
+the listings — the View joins them into compact `PopularTile` rows split by
+hairline dividers, identical to the Popular screen. Hearts toggle honestly, the
+AppBar back arrow steps back to Home, and an empty set renders the designed
+empty state.
+
+Listing details is the design's full page: an inset rounded photo pager (page
+dots plus a tappable thumbnail strip whose active thumb gets the primary
+outline), title with the purple inline price, a `Property Details` facts grid
+(`toSqft()` bills area in square feet like the mockup), a clamped description
+with an inline *Read more* toggle, the agent card with call/chat stubs, a
+`Location & Public Facilities` chip rail over the shared `MapCanvas`, and the
+review cards — all capped by a pinned purple *Rent now* bar. The AppBar share
+icon opens `ShareSheet`, a bottom sheet with the design's 3×2 grid of social
+targets; *Rent now* starts the checkout session for that listing and pushes
+`/booking`, while every remaining stub action (calling, messaging, sharing,
+*See all* reviews) is an honest snackbar until a backend exists.
+
+Booking is the checkout slice behind both entries — the *My Booking* tab
+(renders the same `BookingView` on `/bookings`, Batavia Apartments by default)
+and details' *Rent now*. The session `BookingCubit` holds the listing id, the
+period, the attached card and the confirm status, so a card saved through
+`/booking/add-card` is attached on either entry. `BookingView` reproduces the
+design: the property card from the corpus, a tappable period row whose
+`SelectDateSheet` is a real six-week range calendar (solid purple endpoints,
+pale middle, working month arrows; the sheet edits a temp copy and *Save*
+commits), payments where *Credit or Debit card* pushes the Add Card form while
+Paypal and the voucher are honest stubs, and a price breakdown computed from
+the listing (monthly payment + `$10.00` tax + total). The helper line about
+checking your dates shows only while no payment method is attached — exactly
+what both mockups show. `Confirm and Pay` pins only once a card exists, runs
+the mock gateway's 500ms confirm with a disabled button (never a spinner) and
+raises `BookingSuccessSheet` → *Explore more* → `/explore`. `AddCardCubit`
+validates the four fields with per-field errors over the mockup's prefilled
+sample card, and never stores the CVV when re-editing an attached card.
+
 The shell itself is a custom five-tab `AppShell` (`Home · Explore · Favorite ·
 My Booking · Profile`) with a purple indicator over the active item — Material's
-`NavigationBar` cannot express the design's indicator. Home and My Booking are
-honest `PlaceholderView`s rather than fake content; Explore and Favorites are
-the real feature screens. The whole surface is covered by
-`test/core/routing/shell_navigation_test.dart` (tab switching keeps branch
-state) plus the `location` and `profile` feature suites.
+`NavigationBar` cannot express the design's indicator. All five tabs are real
+feature screens now — My Booking renders the checkout — and the whole surface
+is covered by `test/core/routing/shell_navigation_test.dart` (tab switching
+keeps branch state, a favourite card pushes details over the shell, *Rent now*
+runs the checkout through Add Card to the success sheet) plus the feature
+suites.
 
-Logo, social marks and field icons are addressed through `AppAssets`,
-registered under `assets:` in `pubspec.yaml`.
+Logo, social marks, field icons, gallery photos and the promo banner are
+addressed through `AppAssets`, registered under `assets:` in `pubspec.yaml`.
 
 ## Adding a feature
 

@@ -26,8 +26,12 @@ abstract final class RoutePaths {
 
   // ── Bottom-nav branches (design order: Home · Explore · Favorite ·
   //    My Booking · Profile) ────────────────────────────────────────────────
-  /// Bottom-nav branch: Home (placeholder until its design lands).
+  /// Bottom-nav branch: Home (the landing feed).
   static const String home = '/home';
+
+  /// "Popular for you" list — pushed *inside* the Home branch, so the tab
+  /// bar stays visible and the back arrow returns to the feed.
+  static const String popular = '/home/popular';
 
   /// Bottom-nav branch: property feed.
   static const String explore = '/explore';
@@ -35,8 +39,15 @@ abstract final class RoutePaths {
   /// Bottom-nav branch: saved listings.
   static const String favorites = '/favorites';
 
-  /// Bottom-nav branch: bookings (placeholder until its design lands).
+  /// Bottom-nav branch: the Booking checkout (the session's current
+  /// booking — Batavia Apartments until "Rent now" points it elsewhere).
   static const String bookings = '/bookings';
+
+  /// Checkout screen, full-screen above the shell (pushed by "Rent now").
+  static const String booking = '/booking';
+
+  /// Card form pushed on top of the checkout.
+  static const String addCard = '/booking/add-card';
 
   /// Bottom-nav branch: account hub.
   static const String profile = '/profile';
@@ -78,9 +89,12 @@ abstract final class RouteNames {
   static const String resetPassword = 'reset-password';
   static const String passwordChanged = 'password-changed';
   static const String home = 'home';
+  static const String popular = 'popular';
   static const String explore = 'explore';
   static const String favorites = 'favorites';
   static const String bookings = 'bookings';
+  static const String booking = 'booking';
+  static const String addCard = 'add-card';
   static const String profile = 'profile';
   static const String profileEdit = 'profile-edit';
   static const String propertyDetails = 'property-details';

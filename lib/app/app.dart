@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../core/di/injection.dart';
 import '../core/routing/app_router.dart';
 import '../core/theme/app_theme.dart';
+import '../features/booking/repositories/booking_repository.dart';
+import '../features/booking/viewmodels/booking_cubit.dart';
 import '../features/favorites/viewmodels/favorites_cubit.dart';
 import '../features/properties/repositories/property_repository.dart';
 import '../features/properties/viewmodels/properties_cubit.dart';
@@ -29,7 +31,20 @@ class HouselyApp extends StatelessWidget {
             repository: sl<PropertyRepository>(),
           )..fetchProperties(),
         ),
-        BlocProvider<FavoritesCubit>(create: (_) => FavoritesCubit()),
+        BlocProvider<FavoritesCubit>(
+          // Seeded to the mockup heart states — Ayana, Bali Komang and
+          // Maharani from the Home mockup, Manhattan from the Popular /
+          // Favorite mockups; empty set in tests (they construct the cubit
+          // themselves).
+          create: (_) => FavoritesCubit(initialIds: {'1', '2', '3', '9'}),
+        ),
+        BlocProvider<BookingCubit>(
+          // Session-scoped checkout: the My Booking tab and "Rent now" read
+          // the same booking (Batavia Apartments until a rent is started).
+          create: (_) => BookingCubit(
+            bookingRepository: sl<BookingRepository>(),
+          ),
+        ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) => MaterialApp.router(

@@ -64,7 +64,12 @@ class ForgotPasswordView extends StatelessWidget {
                                 'to reset your password',
                             backLocation: RoutePaths.login,
                           ),
+
+
+
                           const SizedBox(height: AppDimensions.space32),
+
+
                           if (state.contactsStatus == RequestStatus.failure)
                             ErrorView(
                               message: state.failure?.message ??
