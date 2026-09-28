@@ -81,15 +81,20 @@ void main() {
 
     await tester.tap(find.text('My Booking'));
     await tester.pumpAndSettle();
-    // The tab renders the checkout itself — the demo booking from the
-    // mockup, without a payment method (so no Confirm bar yet).
-    expect(find.text('Booking'), findsOneWidget);
-    expect(find.text('Period'), findsOneWidget);
-    expect(find.text('Payments'), findsOneWidget);
-    expect(find.text('Price Details'), findsOneWidget);
+    // The tab renders the three-segment stay list — mock latency first,
+    // then the Upcoming cards from the fixture.
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pumpAndSettle();
+    expect(find.text('My Booking'), findsNWidgets(2)); // header + tab label
+    expect(find.text('Upcoming'), findsOneWidget);
+    expect(find.text('Completed'), findsOneWidget);
+    expect(find.text('Cancelled'), findsOneWidget);
     expect(find.text('Batavia Apartments'), findsOneWidget);
-    expect(find.text('12 Aug - 12 Sep'), findsOneWidget);
-    expect(find.text('Confirm and Pay'), findsNothing);
+    expect(find.text('Waiting payment'), findsOneWidget);
+    expect(find.text('Takatea Homestay'), findsOneWidget);
+    expect(find.text('Checkin'), findsOneWidget);
+    // The checkout is not part of this screen (it lives on /booking).
+    expect(find.text('Price Details'), findsNothing);
 
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
@@ -194,6 +199,34 @@ void main() {
     await tester.tap(find.text('Explore more'));
     await tester.pumpAndSettle();
     expect(find.text('Featured'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the Home bell pushes the inbox and back returns to the feed',
+      (tester) async {
+    await pumpShell(tester);
+
+    await tester.tap(find.byIcon(Icons.notifications_none));
+    await tester.pumpAndSettle();
+    // Skeleton frames until the mock inbox latency elapses.
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Yesterday'), findsOneWidget);
+    expect(
+      find.text(
+        'Anggela and joni send you message, check it now',
+        findRichText: true,
+      ),
+      findsOneWidget,
+    );
+    // Pushed above the shell: the tab bar is not part of this screen.
+    expect(find.text('Home'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('notification_back_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Recommended'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

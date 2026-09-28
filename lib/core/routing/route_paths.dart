@@ -39,8 +39,8 @@ abstract final class RoutePaths {
   /// Bottom-nav branch: saved listings.
   static const String favorites = '/favorites';
 
-  /// Bottom-nav branch: the Booking checkout (the session's current
-  /// booking — Batavia Apartments until "Rent now" points it elsewhere).
+  /// Bottom-nav branch: My Booking — the three-segment stay list (the
+  /// checkout lives on [booking], pushed from the details screen).
   static const String bookings = '/bookings';
 
   /// Checkout screen, full-screen above the shell (pushed by "Rent now").
@@ -54,6 +54,10 @@ abstract final class RoutePaths {
 
   /// Profile editing form, full-screen above the shell (has a back arrow).
   static const String profileEdit = '/profile/edit';
+
+  /// Notification inbox, full-screen above the shell (pushed by the Home
+  /// bell and by the Profile menu's Notification row).
+  static const String notifications = '/notifications';
 
   /// Full-screen detail page, above the shell navigator.
   static const String propertyDetails = '/property/:id';
@@ -97,5 +101,6 @@ abstract final class RouteNames {
   static const String addCard = 'add-card';
   static const String profile = 'profile';
   static const String profileEdit = 'profile-edit';
+  static const String notifications = 'notifications';
   static const String propertyDetails = 'property-details';
 }

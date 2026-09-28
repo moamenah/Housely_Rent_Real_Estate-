@@ -74,6 +74,11 @@ void main() {
           builder: (context, state) =>
               const Scaffold(body: Text('EXPLORE_STUB')),
         ),
+        GoRoute(
+          path: RoutePaths.notifications,
+          builder: (context, state) =>
+              const Scaffold(body: Text('NOTIFICATIONS_STUB')),
+        ),
       ],
     );
   }
@@ -115,6 +120,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('EDIT_STUB'), findsOneWidget);
+  });
+
+  testWidgets('the Notification row opens the inbox', (tester) async {
+    await pumpProfile(tester);
+
+    await tester.tap(find.text('Notification'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('NOTIFICATIONS_STUB'), findsOneWidget);
+    expect(find.text('EDIT_STUB'), findsNothing);
   });
 
   testWidgets('the settings rows are stubbed with a banner', (tester) async {

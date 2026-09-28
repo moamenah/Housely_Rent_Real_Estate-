@@ -10,6 +10,7 @@ abstract final class AppDimensions {
   // ---------------------------------------------------------------------------
   static const double space2 = 2;
   static const double space4 = 4;
+  static const double space6 = 6;
   static const double space8 = 8;
   static const double space12 = 12;
   static const double space16 = 16;
@@ -22,6 +23,15 @@ abstract final class AppDimensions {
 
   /// Common screen gutter.
   static const double pagePadding = space20;
+
+  /// Notification inbox gutter — this screen's mockup runs a 25dp content
+  /// margin (leading circles/headers at x=25, hairlines ending at x=365),
+  /// measured off the export rather than the usual 20dp page padding.
+  static const double pagePaddingWide = 25;
+
+  /// Notification row leading circle (photo/bell/person) — measured 38dp off
+  /// the mockup, which puts the text column at 25 + 38 + 12 = 75dp.
+  static const double notificationLeading = 38;
 
   // ---------------------------------------------------------------------------
   // Radii

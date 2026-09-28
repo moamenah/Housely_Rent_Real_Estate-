@@ -161,10 +161,18 @@ class _ProfileBody extends StatelessWidget {
                                 _MenuRow(
                                   icon: icon,
                                   label: label,
-                                  onTap: () => context.showSnack(
-                                    "$label isn't available "
-                                    'in this build yet.',
-                                  ),
+                                  // Notification is the one row the design
+                                  // ships a screen for; the rest are stubs.
+                                  onTap: () {
+                                    if (label == 'Notification') {
+                                      context.push(RoutePaths.notifications);
+                                      return;
+                                    }
+                                    context.showSnack(
+                                      "$label isn't available "
+                                      'in this build yet.',
+                                    );
+                                  },
                                 ),
                               const SizedBox(height: AppDimensions.space8),
                               Center(

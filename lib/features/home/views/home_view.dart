@@ -204,9 +204,7 @@ class _HomeHeader extends StatelessWidget {
         _CircleButton(
           icon: Icons.notifications_none,
           badge: true,
-          onTap: () => context.showSnack(
-            "Notifications aren't available in this build yet.",
-          ),
+          onTap: () => context.push(RoutePaths.notifications),
         ),
         const SizedBox(width: AppDimensions.space12),
         _CircleButton(

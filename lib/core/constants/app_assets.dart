@@ -92,4 +92,17 @@ abstract final class AppAssets {
 
   /// Success sheet illustration — includes its own pale-purple disc.
   static const String bookingSuccess = 'assets/images/booking_success.png';
+
+  // ── Notifications ───────────────────────────────────────────────────────
+  /// "Opps!!" mailbox hero of the empty inbox (the headline is baked in).
+  static const String notificationOops = 'assets/images/noti_oops.png';
+
+  // ── My Booking ──────────────────────────────────────────────────────────
+  /// Suitcase/phone hero of the empty booking segments (the "Opps!!"
+  /// headline above it is rendered as text — it is not part of the image).
+  static const String bookingOops = 'assets/images/oops.png';
+
+  /// Purple icons of the action rows under a completed/cancelled stay.
+  static const String bookingReview = 'assets/images/review.png';
+  static const String bookingCall = 'assets/images/call.png';
 }

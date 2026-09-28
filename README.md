@@ -71,12 +71,22 @@ lib/
     │   ├── repositories/        # HomeRepository (+ impl) — joins PropertyRepository
     │   ├── viewmodels/          # HomeCubit/State — feed, failure, selected chip
     │   └── views/               # HomeView + widgets/ (cards, tiles, chips, hearts)
-    ├── booking/                  # checkout (My Booking tab + details' Rent now)
-    │   ├── models/               # PaymentCard (grouped number, mask, last4)
-    │   ├── datasources/          # BookingDataSource + mock (500ms confirm)
-    │   ├── repositories/         # BookingRepository (+ impl) — range normalisation
-    │   ├── viewmodels/           # BookingCubit/State (session), AddCardCubit/State
-    │   └── views/                # BookingView, AddCardView + widgets/ (card, sheets)
+    ├── notifications/           # inbox (Home bell + Profile menu's Notification row)
+    │   ├── models/              # NotificationItem/Segment/Section + icon kinds
+    │   ├── datasources/         # NotificationDataSource + mock (7 rows, 600ms)
+    │   ├── repositories/        # NotificationRepository (+ impl)
+    │   ├── viewmodels/          # NotificationCubit/State — load, failure, empty
+    │   └── views/               # NotificationView — day-grouped rows + empty state
+    ├── booking/                  # My Booking list + checkout (details' Rent now)
+    │   ├── models/               # PaymentCard (grouped number, mask, last4),
+    │   │                         # MyBooking + BookingStatus/BookingBadgeTone enums
+    │   ├── datasources/          # BookingDataSource + mock (500ms confirm);
+    │   │                         # MyBookingDataSource + mock (600ms stay list)
+    │   ├── repositories/         # BookingRepository, MyBookingRepository (+ impls)
+    │   ├── viewmodels/           # BookingCubit/State (session), AddCardCubit/State,
+    │   │                         # MyBookingsCubit/State (segments + list)
+    │   └── views/                # MyBookingsView (3-segment list), BookingView,
+    │                             # AddCardView + widgets/ (card, sheets)
     ├── properties/              # Model + ViewModel + View
     │   ├── models/              # Property (entity), PropertyModel (DTO)
     │   ├── datasources/         # PropertyDataSource + mock + REST impl
@@ -132,8 +142,8 @@ and Details all render the same corpus). To go live, register
 a five-branch `StatefulShellRoute` (`/home`, `/explore`, `/favorite`,
 `/bookings`, `/profile`) rendered by a custom `AppShell` bottom bar — a purple
 indicator sits over the active tab and each branch keeps its own state;
-`/property/:id`, `/profile/edit`, `/booking` and `/booking/add-card` are pushed
-on the root navigator above the
+`/property/:id`, `/profile/edit`, `/booking`, `/booking/add-card` and
+`/notifications` are pushed on the root navigator above the
 bar, and `/home/popular` is pushed *inside* the Home branch so the tab bar
 stays visible and its back arrow returns to the feed, while
 `/location-permission` and `/location-picker` sit *outside* the
@@ -206,17 +216,19 @@ demo account): `ProfileCubit` renders the header, the initials-based
 inline validation, the read-only `Date of birth` row
 (`Profile.formatDateOfBirth`, month names without `intl`) and saving.
 `EditProfileView` keeps its own controllers so typing survives rebuilds; save
-success confirms with a snackbar and steps back to Profile. Menu rows and the
-camera badges are honest stubs (`"$label isn't available in this build yet."`
-snackbars); *Sign Out* returns to `/login`, and the avatar (or *Edit profile*)
-opens `/profile/edit` on the root navigator.
+success confirms with a snackbar and steps back to Profile. The *Notification*
+menu row opens the inbox; the remaining menu rows and the camera badges are
+honest stubs (`"$label isn't available in this build yet."` snackbars); *Sign
+Out* returns to `/login`, and the avatar (or *Edit profile*) opens
+`/profile/edit` on the root navigator.
 
 Home is a full MVVM slice rendered from the design's landing feed.
 `MockHomeDataSource` returns a `HomeFeedPlan` — ids only (recommended,
 nearby, popular, destination chips) — and `HomeRepositoryImpl.getFeed()` joins
 it against `PropertyRepository`, so one corpus backs every screen. The View is
-chrome + rails: a location header with bell/chat stubs, a search field and the
-promo banner (both hand off to Explore / a snackbar), then *Recommended*
+chrome + rails: a location header whose bell opens `/notifications` (chat is
+still a stub), a search field and the promo banner (both hand off to Explore /
+a snackbar), then *Recommended*
 (featured-card rail), *Nearby* (two-row grid rail), *Top Locations* (selection
 chips driven by `HomeCubit.selectTopLocation`) and *Popular for you* (rows
 whose *See all* pushes `/home/popular` — the feed shows the first three rows
@@ -225,6 +237,17 @@ Rails bleed off the right edge like the mockup while text keeps the page
 gutter; hearts share the session `FavoritesCubit` with the Favorites tab, and
 loading shows a static skeleton — never shimmer, which would hang
 `pumpAndSettle` in tests.
+
+Notifications is the inbox behind the Home bell and the Profile menu's
+*Notification* row. `MockNotificationDataSource` returns seven rich rows after
+600ms — two under *Today*, five under *Yesterday* — and `NotificationCubit`
+turns them into sections, a failure or the designed empty state.
+`NotificationView` renders each row as a leading slot (pale bell/person circle
+with an unread dot, or the member photo) plus bold/regular message segments
+over a hairline divider, exactly like the mockup; the empty state is the
+`Opps!!` mailbox hero with "No notification yet". The route is pushed above
+the shell, so the back arrow returns to whichever entry point used it (Home as
+the fallback).
 
 Favorites is the design's *Favorite* list: `FavoritesCubit` owns the liked ids
 (session-scoped, seeded with the mockup's hearts) while `PropertiesCubit` owns
@@ -245,9 +268,17 @@ targets; *Rent now* starts the checkout session for that listing and pushes
 `/booking`, while every remaining stub action (calling, messaging, sharing,
 *See all* reviews) is an honest snackbar until a backend exists.
 
-Booking is the checkout slice behind both entries — the *My Booking* tab
-(renders the same `BookingView` on `/bookings`, Batavia Apartments by default)
-and details' *Rent now*. The session `BookingCubit` holds the listing id, the
+My Booking is the design's three-segment stay list rendered by the *My Booking*
+tab (`/bookings` → `MyBookingsView`): the Upcoming · Completed · Cancelled
+pills sit over cards with thumbnail, address, stay dates and a red/green
+status badge — *Waiting payment*/*Checkin* up front, plus the Completed and
+Cancelled segments' action rows (*Write review*, *Call Agent*, both honest
+stubs) and the "Opps!! / You have no … booking" empty state. A screen-scoped
+`MyBookingsCubit` loads the fixture once; segment taps filter the loaded list
+client-side.
+
+Booking itself is the checkout slice pushed from details' *Rent now*
+(`/booking`). The session `BookingCubit` holds the listing id, the
 period, the attached card and the confirm status, so a card saved through
 `/booking/add-card` is attached on either entry. `BookingView` reproduces the
 design: the property card from the corpus, a tappable period row whose

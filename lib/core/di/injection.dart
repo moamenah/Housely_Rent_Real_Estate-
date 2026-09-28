@@ -7,8 +7,12 @@ import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/auth_repository_impl.dart';
 import '../../features/booking/datasources/booking_data_source.dart';
 import '../../features/booking/datasources/mock_booking_data_source.dart';
+import '../../features/booking/datasources/mock_my_booking_data_source.dart';
+import '../../features/booking/datasources/my_booking_data_source.dart';
 import '../../features/booking/repositories/booking_repository.dart';
 import '../../features/booking/repositories/booking_repository_impl.dart';
+import '../../features/booking/repositories/my_booking_repository.dart';
+import '../../features/booking/repositories/my_booking_repository_impl.dart';
 import '../../features/home/datasources/home_data_source.dart';
 import '../../features/home/datasources/mock_home_data_source.dart';
 import '../../features/home/repositories/home_repository.dart';
@@ -17,6 +21,10 @@ import '../../features/location/datasources/location_data_source.dart';
 import '../../features/location/datasources/mock_location_data_source.dart';
 import '../../features/location/repositories/location_repository.dart';
 import '../../features/location/repositories/location_repository_impl.dart';
+import '../../features/notifications/datasources/mock_notification_data_source.dart';
+import '../../features/notifications/datasources/notification_data_source.dart';
+import '../../features/notifications/repositories/notification_repository.dart';
+import '../../features/notifications/repositories/notification_repository_impl.dart';
 import '../../features/password_recovery/datasources/mock_password_recovery_data_source.dart';
 import '../../features/password_recovery/datasources/password_recovery_data_source.dart';
 import '../../features/password_recovery/repositories/password_recovery_repository.dart';
@@ -116,11 +124,30 @@ void _registerFeatures() {
   );
 
   // ── Booking ─────────────────────────────────────────────────────────────
-  // Checkout session (My Booking tab / "Rent now"): confirm runs through
-  // the mock gateway with real latency.
+  // Checkout session ("Rent now"): confirm runs through the mock gateway
+  // with real latency.
   sl.registerLazySingleton<BookingDataSource>(MockBookingDataSource.new);
 
   sl.registerLazySingleton<BookingRepository>(
     () => BookingRepositoryImpl(dataSource: sl<BookingDataSource>()),
+  );
+
+  // My Booking tab (the three-segment stay list) — the View's screen-scoped
+  // cubit reads through this.
+  sl.registerLazySingleton<MyBookingDataSource>(MockMyBookingDataSource.new);
+
+  sl.registerLazySingleton<MyBookingRepository>(
+    () => MyBookingRepositoryImpl(dataSource: sl<MyBookingDataSource>()),
+  );
+
+  // ── Notifications ───────────────────────────────────────────────────────
+  // Day-grouped inbox behind the Home bell / Profile menu; swap the mock for
+  // a push/polling feed and the ViewModel stays untouched.
+  sl.registerLazySingleton<NotificationDataSource>(
+    MockNotificationDataSource.new,
+  );
+
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(dataSource: sl<NotificationDataSource>()),
   );
 }

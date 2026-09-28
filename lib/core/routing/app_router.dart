@@ -7,6 +7,8 @@ import '../../features/auth/views/login_view.dart';
 import '../../features/auth/views/sign_up_view.dart';
 import '../../features/booking/views/add_card_view.dart';
 import '../../features/booking/views/booking_view.dart';
+import '../../features/booking/views/my_bookings_view.dart';
+import '../../features/booking/repositories/my_booking_repository.dart';
 import '../../features/favorites/views/favorites_view.dart';
 import '../../features/home/repositories/home_repository.dart';
 import '../../features/home/views/home_view.dart';
@@ -14,6 +16,8 @@ import '../../features/home/views/popular_view.dart';
 import '../../features/location/repositories/location_repository.dart';
 import '../../features/location/views/location_permission_view.dart';
 import '../../features/location/views/location_picker_view.dart';
+import '../../features/notifications/repositories/notification_repository.dart';
+import '../../features/notifications/views/notification_view.dart';
 import '../../features/onboarding/views/onboarding_view.dart';
 import '../../features/password_recovery/repositories/password_recovery_repository.dart';
 import '../../features/password_recovery/viewmodels/password_recovery_cubit.dart';
@@ -61,6 +65,8 @@ final GlobalKey<NavigatorState> rootNavigatorKey =
 /// ├── /bookings    (BookingView — the session's current checkout)
 /// └── /profile     (ProfileView)
 /// /profile/edit                    ← full screen, above the shell
+/// /notifications                   ← full screen, from the Home bell or
+///                                    the Profile menu's Notification row
 /// /property/:id                    ← full screen, above the shell
 /// /booking                         ← full screen, pushed by "Rent now"
 /// /booking/add-card                ← full screen, pushed by the checkout
@@ -191,7 +197,9 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: RoutePaths.bookings,
               name: RouteNames.bookings,
-              builder: (context, state) => const BookingView(),
+              builder: (context, state) => MyBookingsView(
+                myBookingRepository: sl<MyBookingRepository>(),
+              ),
             ),
           ],
         ),
@@ -213,6 +221,14 @@ final GoRouter appRouter = GoRouter(
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) =>
           EditProfileView(profileRepository: sl<ProfileRepository>()),
+    ),
+    GoRoute(
+      path: RoutePaths.notifications,
+      name: RouteNames.notifications,
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => NotificationView(
+        notificationRepository: sl<NotificationRepository>(),
+      ),
     ),
     GoRoute(
       path: RoutePaths.propertyDetails,

@@ -106,6 +106,11 @@ void main() {
           builder: (context, state) =>
               const Scaffold(body: Text('PROPERTY_STUB')),
         ),
+        GoRoute(
+          path: RoutePaths.notifications,
+          builder: (context, state) =>
+              const Scaffold(body: Text('NOTIFICATIONS_STUB')),
+        ),
       ],
     );
   }
@@ -309,6 +314,16 @@ void main() {
     expect(find.text('Something went wrong'), findsNothing);
   });
 
+  testWidgets('the bell opens the notification inbox', (tester) async {
+    await pumpHome(tester);
+
+    await tester.tap(find.byIcon(Icons.notifications_none));
+    await tester.pumpAndSettle();
+    // The bell opens the real inbox screen (stubbed here).
+    expect(find.text('NOTIFICATIONS_STUB'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('peripheral actions are stubbed with a banner', (tester) async {
     await pumpHome(tester);
 
@@ -316,13 +331,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.text("Changing your location isn't available in this build yet."),
-      findsOneWidget,
-    );
-
-    await tester.tap(find.byIcon(Icons.notifications_none));
-    await tester.pumpAndSettle();
-    expect(
-      find.text("Notifications aren't available in this build yet."),
       findsOneWidget,
     );
 

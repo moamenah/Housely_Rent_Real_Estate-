@@ -39,8 +39,9 @@ class HouselyApp extends StatelessWidget {
           create: (_) => FavoritesCubit(initialIds: {'1', '2', '3', '9'}),
         ),
         BlocProvider<BookingCubit>(
-          // Session-scoped checkout: the My Booking tab and "Rent now" read
-          // the same booking (Batavia Apartments until a rent is started).
+          // Session-scoped checkout for the "Rent now" flow (Batavia
+          // Apartments until a rent is started); the My Booking tab runs
+          // its own list screen on MyBookingsCubit.
           create: (_) => BookingCubit(
             bookingRepository: sl<BookingRepository>(),
           ),
